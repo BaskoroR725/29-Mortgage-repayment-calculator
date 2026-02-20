@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
+
 import * as z from "zod";
 import "./App.css";
+
+// Helper format number
+const formatNumber = (value: string) => {
+  if (!value) return "";
+  const number = value.replace(/\D/g, "");
+  return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 //1.Schema validation zod
 const schema = z.object({
@@ -26,10 +35,14 @@ function App() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<formData>({
     resolver: zodResolver(schema),
   });
+
+  const mortgageType = watch("type");
 
   //2. Function Mortgage calculation
   const onSubmit = (data: formData) => {
@@ -106,6 +119,10 @@ function App() {
                   {...register("amount")}
                   type="text"
                   className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                  onChange={(e) => {
+                    const formatted = formatNumber(e.target.value);
+                    setValue("amount", formatted);
+                  }}
                 />
               </div>
               {errors.amount && (
@@ -171,7 +188,13 @@ function App() {
               </label>
               <div className="space-y-3">
                 <label
-                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors font-bold ${errors.type ? "border-red" : "border-slate-300 hover:border-lime"}`}
+                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors font-bold ${
+                    errors.type
+                      ? "border-red"
+                      : mortgageType === "repayment"
+                        ? "border-lime bg-lime/10"
+                        : "border-slate-300 hover:border-lime"
+                  }`}
                 >
                   <input
                     {...register("type")}
@@ -182,7 +205,13 @@ function App() {
                   Repayment
                 </label>
                 <label
-                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors font-bold ${errors.type ? "border-red" : "border-slate-300 hover:border-lime"}`}
+                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors font-bold ${
+                    errors.type
+                      ? "border-red"
+                      : mortgageType === "interest-only"
+                        ? "border-lime bg-lime/10"
+                        : "border-slate-300 hover:border-lime"
+                  }`}
                 >
                   <input
                     {...register("type")}
@@ -206,53 +235,69 @@ function App() {
             </button>
           </form>
         </section>
-        
+
         {/* --- RIGHT SECTION: Results --- */}
         <section className="flex-1 p-6 md:p-10 flex flex-col items-center justify-center text-center md:text-left md:rounded-bl-[80px] bg-slate-900">
-          {!results ? (
-            <div className="flex flex-col items-center">
-              <img
-                src="/assets/images/illustration-empty.svg"
-                alt=""
-                className="mb-6"
-              />
-              <h2 className="text-white text-2xl font-bold mb-4">
-                Results shown here
-              </h2>
-              <p className="text-slate-300">
-                Complete the form and click "calculate repayments" to see what
-                your monthly repayments would be.
-              </p>
-            </div>
-          ) : (
-            <div className="w-full">
-              <h2 className="text-white text-2xl font-bold mb-4">
-                Your results
-              </h2>
-              <p className="text-slate-300 mb-8">
-                Your results are shown below based on the information you
-                provided. To adjust the results, edit the form and click
-                "calculate repayments" again.
-              </p>
+          <AnimatePresence mode="wait">
+            {!results ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex flex-col items-center"
+              >
+                <img
+                  src="/assets/images/illustration-empty.svg"
+                  alt=""
+                  className="mb-6"
+                />
+                <h2 className="text-white text-2xl font-bold mb-4">
+                  Results shown here
+                </h2>
+                <p className="text-slate-300">
+                  Complete the form and click "calculate repayments" to see what
+                  your monthly repayments would be.
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="w-full"
+              >
+                <h2 className="text-white text-2xl font-bold mb-4">
+                  Your results
+                </h2>
+                <p className="text-slate-300 mb-8">
+                  Your results are shown below based on the information you
+                  provided. To adjust the results, edit the form and click
+                  "calculate repayments" again.
+                </p>
 
-              <div className="bg-slate-900/50 p-6 md:p-8 rounded-xl border-t-4 border-lime shadow-2xl bg-black/20">
-                <div className="mb-8 border-b border-slate-700 pb-8">
-                  <p className="text-slate-300 mb-2">Your monthly repayments</p>
-                  <p className="text-lime text-5xl md:text-6xl font-bold">
-                    £{results.monthly}
-                  </p>
+                <div className="bg-slate-900/50 p-6 md:p-8 rounded-xl border-t-4 border-lime shadow-2xl bg-black/20">
+                  <div className="mb-8 border-b border-slate-700 pb-8">
+                    <p className="text-slate-300 mb-2">
+                      Your monthly repayments
+                    </p>
+                    <p className="text-lime text-5xl md:text-6xl font-bold">
+                      £{results.monthly}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-300 mb-2">
+                      Total you'll repay over the term
+                    </p>
+                    <p className="text-white text-2xl font-bold">
+                      £{results.total}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-slate-300 mb-2">
-                    Total you'll repay over the term
-                  </p>
-                  <p className="text-white text-2xl font-bold">
-                    £{results.total}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       </div>
     </main>
