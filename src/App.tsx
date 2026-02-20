@@ -282,7 +282,7 @@ function App() {
               type="submit"
               className="w-full md:w-fit cursor-pointer flex items-center justify-center gap-3 bg-lime text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-opacity-70 transition-all"
             >
-              <img src="/assets/images/icon-calculator.svg" alt="" />
+              <img src="assets/images/icon-calculator.svg" alt="" />
               Calculate Repayments
             </motion.button>
           </form>
@@ -300,7 +300,7 @@ function App() {
                 className="flex flex-col items-center"
               >
                 <img
-                  src="/assets/images/illustration-empty.svg"
+                  src="assets/images/illustration-empty.svg"
                   alt=""
                   className="mb-6"
                 />
