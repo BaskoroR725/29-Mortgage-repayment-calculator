@@ -13,6 +13,19 @@ const formatNumber = (value: string) => {
   return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
+// Helper sanitize input
+const sanitizeInt = (value: string) => value.replace(/\D/g, "");
+const sanitizeFloat = (value: string) => {
+  // Hanya ambil angka dan titik
+  let cleaned = value.replace(/[^0-9.]/g, "");
+  // Pastikan hanya ada satu titik desimal
+  const parts = cleaned.split(".");
+  if (parts.length > 2) {
+    cleaned = parts[0] + "." + parts.slice(1).join("");
+  }
+  return cleaned;
+};
+
 //1.Schema validation zod
 const schema = z.object({
   amount: z.string().min(1, "This field is required"),
@@ -104,24 +117,34 @@ function App() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* amount */}
             <div className="space-y-2">
-              <label className="text-slate-700 font-medium">
+              <label htmlFor="amount" className="text-slate-700 font-medium">
                 Mortgage Amount
               </label>
               <div
-                className={`flex border rounded-lg overflow-hidden transition-colors ${errors.amount ? "border-red" : "border-slate-300 hover:border-slate-900"}`}
+                className={`group flex border rounded-lg overflow-hidden transition-colors ${
+                  errors.amount
+                    ? "border-red"
+                    : "border-slate-300 focus-within:border-lime"
+                }`}
               >
                 <span
-                  className={`px-4 py-3 font-bold ${errors.amount ? "bg-red text-white" : "bg-slate-100 text-slate-700"}`}
+                  className={`px-4 py-3 font-bold transition-colors ${
+                    errors.amount
+                      ? "bg-red text-white"
+                      : "bg-slate-100 text-slate-700 group-focus-within:bg-lime group-focus-within:text-slate-900"
+                  }`}
                 >
                   £
                 </span>
                 <input
                   {...register("amount")}
                   type="text"
+                  inputMode="decimal" 
+                  id="amount"
                   className="w-full px-4 py-3 outline-none font-bold text-slate-900"
                   onChange={(e) => {
                     const formatted = formatNumber(e.target.value);
-                    setValue("amount", formatted);
+                    setValue("amount", formatted, { shouldValidate: true });
                   }}
                 />
               </div>
@@ -133,19 +156,33 @@ function App() {
             {/* term */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-slate-700 font-medium">
+                <label htmlFor="term" className="text-slate-700 font-medium">
                   Mortgage Term
                 </label>
                 <div
-                  className={`flex border rounded-lg overflow-hidden transition-colors ${errors.term ? "border-red" : "border-slate-300 hover:border-slate-900"}`}
+                  className={`group flex border rounded-lg overflow-hidden transition-colors ${
+                    errors.term
+                      ? "border-red"
+                      : "border-slate-300 focus-within:border-lime"
+                  }`}
                 >
                   <input
                     {...register("term")}
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    id="term"
                     className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                    onChange={(e) => {
+                      const sanitized = sanitizeInt(e.target.value);
+                      setValue("term", sanitized, { shouldValidate: true });
+                    }}
                   />
                   <span
-                    className={`px-4 py-3 font-bold ${errors.term ? "bg-red text-white" : "bg-slate-100 text-slate-700"}`}
+                    className={`px-4 py-3 font-bold transition-colors ${
+                      errors.term
+                        ? "bg-red text-white"
+                        : "bg-slate-100 text-slate-700 group-focus-within:bg-lime group-focus-within:text-slate-900"
+                    }`}
                   >
                     years
                   </span>
@@ -157,20 +194,33 @@ function App() {
 
               {/* interest rate */}
               <div className="space-y-2">
-                <label className="text-slate-700 font-medium">
+                <label htmlFor="rate" className="text-slate-700 font-medium">
                   Interest Rate
                 </label>
                 <div
-                  className={`flex border rounded-lg overflow-hidden transition-colors ${errors.rate ? "border-red" : "border-slate-300 hover:border-slate-900"}`}
+                  className={`group flex border rounded-lg overflow-hidden transition-colors ${
+                    errors.rate
+                      ? "border-red"
+                      : "border-slate-300 focus-within:border-lime"
+                  }`}
                 >
                   <input
                     {...register("rate")}
                     step="0.1"
-                    type="number"
+                    id="rate"
+                    type="text"
                     className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                    onChange={(e) => {
+                      const sanitized = sanitizeFloat(e.target.value);
+                      setValue("rate", sanitized, { shouldValidate: true });
+                    }}
                   />
                   <span
-                    className={`px-4 py-3 font-bold ${errors.rate ? "bg-red text-white" : "bg-slate-100 text-slate-700"}`}
+                    className={`px-4 py-3 font-bold transition-colors ${
+                      errors.rate
+                        ? "bg-red text-white"
+                        : "bg-slate-100 text-slate-700 group-focus-within:bg-lime group-focus-within:text-slate-900"
+                    }`}
                   >
                     %
                   </span>
@@ -226,13 +276,15 @@ function App() {
                 <p className="text-red text-sm">{errors.type.message}</p>
               )}
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               className="w-full md:w-fit flex items-center justify-center gap-3 bg-lime text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-opacity-70 transition-all"
             >
               <img src="/assets/images/icon-calculator.svg" alt="" />
               Calculate Repayments
-            </button>
+            </motion.button>
           </form>
         </section>
 
@@ -265,6 +317,7 @@ function App() {
                 key="results"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="w-full"
               >
