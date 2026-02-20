@@ -98,8 +98,8 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 flex items-center justify-center p-0 md: p-8">
-      <div className="bg-white w-full max-w-[1000px] flex flex-col md:flex-row shadow-xl md:rounded-3xl overflow-hidden">
+    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4 md:p-8">
+      <main className="bg-white w-full max-w-[1000px] flex flex-col md:flex-row shadow-xl md:rounded-3xl overflow-hidden">
         {/* Left section: form */}
         <section className="flex-1 p-6 md:p-10">
           <div className="flex items-center justify-between mb-8">
@@ -116,7 +116,7 @@ function App() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* amount */}
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               <label htmlFor="amount" className="text-slate-700 font-medium">
                 Mortgage Amount
               </label>
@@ -139,9 +139,9 @@ function App() {
                 <input
                   {...register("amount")}
                   type="text"
-                  inputMode="decimal" 
+                  inputMode="decimal"
                   id="amount"
-                  className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                  className="w-full px-4 py-3 outline-none font-bold text-slate-900 cursor-pointer"
                   onChange={(e) => {
                     const formatted = formatNumber(e.target.value);
                     setValue("amount", formatted, { shouldValidate: true });
@@ -171,7 +171,7 @@ function App() {
                     type="text"
                     inputMode="numeric"
                     id="term"
-                    className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                    className="w-full px-4 py-3 outline-none font-bold text-slate-900 cursor-pointer"
                     onChange={(e) => {
                       const sanitized = sanitizeInt(e.target.value);
                       setValue("term", sanitized, { shouldValidate: true });
@@ -209,7 +209,7 @@ function App() {
                     step="0.1"
                     id="rate"
                     type="text"
-                    className="w-full px-4 py-3 outline-none font-bold text-slate-900"
+                    className="w-full px-4 py-3 outline-none font-bold text-slate-900 cursor-pointer"
                     onChange={(e) => {
                       const sanitized = sanitizeFloat(e.target.value);
                       setValue("rate", sanitized, { shouldValidate: true });
@@ -280,7 +280,7 @@ function App() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full md:w-fit flex items-center justify-center gap-3 bg-lime text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-opacity-70 transition-all"
+              className="w-full md:w-fit cursor-pointer flex items-center justify-center gap-3 bg-lime text-slate-900 px-8 py-4 rounded-full font-bold hover:bg-opacity-70 transition-all"
             >
               <img src="/assets/images/icon-calculator.svg" alt="" />
               Calculate Repayments
@@ -352,8 +352,26 @@ function App() {
             )}
           </AnimatePresence>
         </section>
-      </div>
-    </main>
+      </main>
+
+      <footer className="mt-8 text-center text-xs text-slate-500">
+        Challenge by{" "}
+        <a
+          href="https://www.frontendmentor.io?ref=challenge"
+          className="text-slate-700 hover:text-lime underline transition-colors"
+        >
+          Frontend Mentor
+        </a>
+        . Coded by{" "}
+        <a
+          href="https://github.com/BaskoroR725"
+          className="text-slate-700 hover:text-lime underline transition-colors"
+        >
+          Baskoro Ramadhan
+        </a>
+        .
+      </footer>
+    </div>
   );
 }
 
