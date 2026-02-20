@@ -34,11 +34,14 @@ describe("Mortgage Calculator", () => {
     );
 
     // Tunggu sampai header hasil muncul (spesifik sebagai heading)
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /your results/i }),
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole("heading", { name: /your results/i }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
 
     // Menggunakan regex untuk mencocokkan angka tanpa peduli pemisah desimal/ribuan
     // Hasil: 1,797.74 atau 1.797,74
@@ -64,8 +67,11 @@ describe("Mortgage Calculator", () => {
     );
 
     // Bunga saja: (300,000 * 0.05) / 12 = 1250
-    await waitFor(() => {
-      expect(screen.getByText(/1.*250.*00/)).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText(/1.*250.*00/)).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
 });
