@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "./",
+  base: "/29-Mortgage-repayment-calculator/",
   plugins: [react(), tailwindcss()],
   test: {
     globals: true,
